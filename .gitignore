@@ -3,3 +3,6 @@ testFolder/
 .git/
 pyrightconfig.json
 .vscode/
+.gitignore
+
+src/
