@@ -12,7 +12,9 @@ class XpaMainWindow(QWidget, xpaMainWindowUI):
         super().__init__()
         self.setupUi(self)
 
-    def loadNewXPA_pushButtonClicked(self):
+        self.loadNewXpa_pushButton.clicked.connect(self.loadNewXpa_pushButtonClicked)
+
+    def loadNewXpa_pushButtonClicked(self):
         nxpaName = QFileDialog.getOpenFileName(self, 'nxpa 파일 선택', BASE_DIR, "nxpa (*.nxpa)")
 
         if nxpaName[0]:
@@ -21,7 +23,7 @@ class XpaMainWindow(QWidget, xpaMainWindowUI):
             # 잘못된 파일이라고 팝업 dialog 띄우기
             pass
 
-    def createNewXPA_pushButtonClicked(self):
+    def createNewXpa_pushButtonClicked(self):
         pass
 
     
