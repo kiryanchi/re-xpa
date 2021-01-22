@@ -13,6 +13,7 @@ class XpaMainWindow(QWidget, xpaMainWindowUI):
         self.setupUi(self)
 
         self.loadNewXpa_pushButton.clicked.connect(self.loadNewXpa_pushButtonClicked)
+        self.createNewXpa_pushButton.clicked.connect(self.createNewXpa_pushButtonClicked)
 
     def loadNewXpa_pushButtonClicked(self):
         nxpaName = QFileDialog.getOpenFileName(self, 'nxpa 파일 선택', BASE_DIR, "nxpa (*.nxpa)")
