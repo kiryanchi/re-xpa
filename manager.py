@@ -83,6 +83,7 @@ class WindowController:
     다음 창에 필요한 정보를 넘겨주거나 창을 띄우고 없애는 역할
     """
     def __init__(self):
+        self.test = "test"
         pass
 
     def showXpaMainWindow(self):
