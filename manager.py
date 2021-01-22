@@ -28,6 +28,31 @@ class WorkSpaceWindow(QWidget, workSpaceWindowUI):
         self.setupUi(self)
 
         self.fileName_label.setText(self.nxpaName)
+
+        # Sheet Buttons
+        self.addSheet_pushButton.clicked.connect(self.addSheet_pushButtonClicked)
+        self.removeSheet_pushButton.clicked.connect(self.removeSheet_pushButtonClicked)
+
+        # Cell Buttons
+        self.addCell_pushButton.clicked.connect(self.addCell_pushButtonClicked)
+        self.removeCell_pushButton.clicked.connect(self.removeCell_pushButtonClicked)
+
+    @pyqtSlot()
+    def addSheet_pushButtonClicked(self):
+        pass
+
+    @pyqtSlot()
+    def removeSheet_pushButtonClicked(self):
+        pass
+
+    @pyqtSlot()
+    def addCell_pushButtonClicked(self):
+        pass
+
+    @pyqtSlot()
+    def removeCell_pushButtonClicked(self):
+        pass
+    
 class XpaMainWindow(QWidget, xpaMainWindowUI):
     """
     nxpa 파일을 만들거나 불러오는 공간
