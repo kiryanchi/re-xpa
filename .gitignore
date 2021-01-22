@@ -2,3 +2,4 @@ xpa-venv/
 testFolder/
 .git/
 pyrightconfig.json
+.vscode/
