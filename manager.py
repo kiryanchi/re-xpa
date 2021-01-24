@@ -3,7 +3,7 @@ import os
 import logging
 import openpyxl
 import openpyxl_image_loader
-from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QMainWindow, QTabBar, QTabWidget, QScrollArea, QTableWidget, QHeaderView, QAbstractItemView
+from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QMainWindow, QTabBar, QTabWidget, QScrollArea, QTableWidget, QHeaderView, QAbstractItemView, QDialog
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5 import QtCore
@@ -17,11 +17,13 @@ logging.basicConfig(
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 managerUI = uic.loadUiType('UI/manager.ui')[0]
+loaddialogUI = uic.loadUiType('UI/loaddialog.ui')[0]
 
 class SheetInnerTableWidget(QTableWidget):
     def __init__(self):
         super().__init__(5, 1)
         self.setAcceptDrops(True)
+        self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.setAlternatingRowColors(True)
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -30,9 +32,13 @@ class SheetInnerTableWidget(QTableWidget):
 
 
 class ManagerMainWindow(QMainWindow, managerUI):
-    def __init__(self):
+
+    def __init__(self, fileInfo):
         super().__init__()
+        logging.info(fileInfo)
         self.setupUi(self)
+
+        self._initWindow(fileInfo)
     
         self.addSheet_pushButton.clicked.connect(self.addSheet_pushButtonClicked)
         self.removeSheet_pushButton.clicked.connect(self.removeSheet_pushButtonClicked)
@@ -48,6 +54,31 @@ class ManagerMainWindow(QMainWindow, managerUI):
         self.copy_action.triggered.connect(self.copy_actiontriggered)
         self.paste_action.triggered.connect(self.paste_actiontriggered)
         self.delete_action.triggered.connect(self.delete_actiontriggered)
+
+    def _initWindow(self, fileInfo):
+        self.fileName_label.setText(fileInfo['fileName'].split('/')[-1])
+        def _gimhaeInit_(sheetNames):
+            pass
+
+        def _cjInit_(sheetNames):
+            pass
+
+        def _girlInit_(sheetNames):
+            pass
+
+        try:
+            self.wb = openpyxl.load_workbook(fileInfo['fileName'])
+        except FileNotFoundError:
+            logging.error('ManagerMainWindow : _initWindow Error')
+        else:
+            if fileInfo['fileType'] == '김해':
+                _gimhaeInit_(self.wb.sheetnames)
+            
+            elif fileInfo['fileType'] == 'CJ':
+                _cjInit_(self.wb.sheetnames)
+
+            elif fileInfo['fileType'] == '여성':
+                _girlInit_(self.wb.sheetnames)
 
 
     @pyqtSlot()
@@ -68,10 +99,7 @@ class ManagerMainWindow(QMainWindow, managerUI):
 
     @pyqtSlot()
     def open_actiontriggered(self):
-        fileName = QFileDialog.getOpenFileName(self, 'xlsx file', './', 'Excel Files(*.xlsx)')
-        logging.info(fileName[0])
-        self.fileName_label.setText(fileName[0].split('/')[-1])
-
+        self._openExcel_()
 
     def _addSheet_(self, text):
         self.sheetList_tabWidget.addTab(SheetInnerTableWidget(), text + f'{self.sheetList_tabWidget.count()}')
@@ -82,10 +110,10 @@ class ManagerMainWindow(QMainWindow, managerUI):
     def _removeSheet_(self):
         self.sheetList_tabWidget.removeTab(self.sheetList_tabWidget.currentIndex())
 
-    def _removeCell(self):
+    def _removeCell_(self):
         pass
 
-    def _openExcel(self):
+    def _openExcel_(self):
         fileName = QFileDialog.getOpenFileName(self, 'xlsx file', './', 'Excel Files(*.xlsx)')
         logging.info(fileName[0])
         self.fileName_label.setText(fileName[0].split('/')[-1])
@@ -119,6 +147,30 @@ class ManagerMainWindow(QMainWindow, managerUI):
         pass
 
 
+class LoadDialog(QDialog, loaddialogUI):
+    switch_window = pyqtSignal(dict)
+    fileInfo = {}
+
+    def __init__(self):
+        super().__init__()
+        self.setupUi(self)
+
+        self.start_pushButton.clicked.connect(self.start_pushButtonClicked)
+        self.loadFile_pushButton.clicked.connect(self.loadFile_pushButtonClicked)
+
+    def loadFile_pushButtonClicked(self):
+        fileName = QFileDialog.getOpenFileName(self, 'xlsx file', './', 'Excel Files(*.xlsx)')
+        self.fileInfo['fileName'] = fileName[0]
+        logging.info(fileName[0])
+        self.fileName_label.setText(fileName[0].split('/')[-1])
+
+    @pyqtSlot()
+    def start_pushButtonClicked(self):
+        self.fileInfo['fileType'] = self.fileType_comboBox.currentText()
+        self.switch_window.emit(self.fileInfo)
+
+
+
 class WindowController:
     """
     창을 변환하는 컨트롤러
@@ -128,8 +180,14 @@ class WindowController:
         self.test = "test"
         pass
 
-    def showManagerMainWindow(self):
-        self.managerMainWindow = ManagerMainWindow()
+    def showLoadDialog(self):
+        self.loadDialog = LoadDialog()
+        self.loadDialog.switch_window.connect(self.showManagerMainWindow)
+        self.loadDialog.show()
+
+    def showManagerMainWindow(self, fileInfo):
+        self.managerMainWindow = ManagerMainWindow(fileInfo)
+        self.loadDialog.close()
         self.managerMainWindow.show()
 
 #    def showXpaMainWindow(self):
@@ -147,7 +205,7 @@ class WindowController:
 def main():
     app = QApplication(sys.argv)
     windowController = WindowController()
-    windowController.showManagerMainWindow()
+    windowController.showLoadDialog()
     app.exec_()
 
 
