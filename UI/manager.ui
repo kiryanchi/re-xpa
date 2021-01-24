@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>805</width>
+    <height>632</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="2">
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="0" column="1">
+     <widget class="QPushButton" name="removeSheet_pushButton">
+      <property name="text">
+       <string>시트 삭제</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="6">
+     <widget class="QPushButton" name="removeCell_pushButton">
+      <property name="text">
+       <string>칸 삭제</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="5">
+     <widget class="QPushButton" name="addCell_pushButton">
+      <property name="text">
+       <string>칸 추가</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QPushButton" name="addSheet_pushButton">
+      <property name="text">
+       <string>시트 추가</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0" colspan="7">
+     <widget class="QTabWidget" name="sheetList_tabWidget">
+      <property name="minimumSize">
+       <size>
+        <width>781</width>
+        <height>533</height>
+       </size>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <property name="usesScrollButtons">
+       <bool>true</bool>
+      </property>
+      <property name="documentMode">
+       <bool>true</bool>
+      </property>
+      <property name="movable">
+       <bool>true</bool>
+      </property>
+      <property name="tabBarAutoHide">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Page</string>
+       </attribute>
+      </widget>
+     </widget>
+    </item>
+    <item row="0" column="3">
+     <widget class="QLabel" name="fileName_label">
+      <property name="text">
+       <string>파일이름</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="4">
+     <spacer name="horizontalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar_menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>805</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="defaultUp">
+    <bool>false</bool>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>false</bool>
+   </property>
+   <widget class="QMenu" name="fileMenu_menu">
+    <property name="title">
+     <string>파일</string>
+    </property>
+    <addaction name="open_action"/>
+    <addaction name="separator"/>
+    <addaction name="save_action"/>
+    <addaction name="saveas_action"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit_menuBar">
+    <property name="title">
+     <string>편집</string>
+    </property>
+    <addaction name="undo_action"/>
+    <addaction name="redo_action"/>
+    <addaction name="separator"/>
+    <addaction name="copy_action"/>
+    <addaction name="paste_action"/>
+    <addaction name="delete_action"/>
+   </widget>
+   <addaction name="fileMenu_menu"/>
+   <addaction name="menuEdit_menuBar"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar_statusBar"/>
+  <action name="open_action">
+   <property name="text">
+    <string>열기</string>
+   </property>
+  </action>
+  <action name="save_action">
+   <property name="text">
+    <string>저장</string>
+   </property>
+  </action>
+  <action name="saveas_action">
+   <property name="text">
+    <string>새 이름으로 저장</string>
+   </property>
+  </action>
+  <action name="undo_action">
+   <property name="text">
+    <string>실행취소</string>
+   </property>
+  </action>
+  <action name="redo_action">
+   <property name="text">
+    <string>다시실행</string>
+   </property>
+  </action>
+  <action name="copy_action">
+   <property name="text">
+    <string>copy</string>
+   </property>
+  </action>
+  <action name="paste_action">
+   <property name="text">
+    <string>paste</string>
+   </property>
+  </action>
+  <action name="delete_action">
+   <property name="text">
+    <string>delete</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

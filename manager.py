@@ -1,9 +1,12 @@
 import sys
 import os
 import logging
-from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog
+import openpyxl
+import openpyxl_image_loader
+from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QMainWindow, QTabBar, QTabWidget, QScrollArea, QTableWidget, QHeaderView, QAbstractItemView
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
+from PyQt5 import QtCore
 
 # logging 설정
 logging.basicConfig(
@@ -13,93 +16,107 @@ logging.basicConfig(
 )
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-xpaMainWindowUI = uic.loadUiType('UI/main.ui')[0]
-workSpaceWindowUI = uic.loadUiType('UI/workspace.ui')[0]
+managerUI = uic.loadUiType('UI/manager.ui')[0]
+
+class SheetInnerTableWidget(QTableWidget):
+    def __init__(self):
+        super().__init__(5, 1)
+        self.setAcceptDrops(True)
+        self.setAlternatingRowColors(True)
+        self.setFocusPolicy(QtCore.Qt.StrongFocus)
+        self.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.insertRow(self.rowCount())
 
 
-class WorkSpaceWindow(QWidget, workSpaceWindowUI):
-    """
-    실제로 사진 작업이 이루어지는 공간
-    """
-    def __init__(self, xpaInfo):
-        super().__init__()
-        self.nxpaName, self.type, self.numSheet, self.numBlock = xpaInfo.values()
-
-        self.setupUi(self)
-
-        self.fileName_label.setText(self.nxpaName)
-
-        # Sheet Buttons
-        self.addSheet_pushButton.clicked.connect(self.addSheet_pushButtonClicked)
-        self.removeSheet_pushButton.clicked.connect(self.removeSheet_pushButtonClicked)
-
-        # Cell Buttons
-        self.addCell_pushButton.clicked.connect(self.addCell_pushButtonClicked)
-        self.removeCell_pushButton.clicked.connect(self.removeCell_pushButtonClicked)
-
-    @pyqtSlot()
-    def addSheet_pushButtonClicked(self):
-        pass
-
-    @pyqtSlot()
-    def removeSheet_pushButtonClicked(self):
-        pass
-
-    @pyqtSlot()
-    def addCell_pushButtonClicked(self):
-        pass
-
-    @pyqtSlot()
-    def removeCell_pushButtonClicked(self):
-        pass
-    
-class XpaMainWindow(QWidget, xpaMainWindowUI):
-    """
-    nxpa 파일을 만들거나 불러오는 공간
-    """
-
-    switch_window = pyqtSignal(dict)
-
+class ManagerMainWindow(QMainWindow, managerUI):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        logging.info(f'NXPA Manager Start')
+    
+        self.addSheet_pushButton.clicked.connect(self.addSheet_pushButtonClicked)
+        self.removeSheet_pushButton.clicked.connect(self.removeSheet_pushButtonClicked)
+        self.addCell_pushButton.clicked.connect(self.addCell_pushButtonClicked)
+        self.removeCell_pushButton.clicked.connect(self.removeCell_pushButtonClicked)
 
-        self.loadNewXpa_pushButton.clicked.connect(self.loadNewXpa_pushButtonClicked)
-        self.createNewXpa_pushButton.clicked.connect(self.createNewXpa_pushButtonClicked)
+        self.open_action.triggered.connect(self.open_actiontriggered)
+        self.save_action.triggered.connect(self.save_actiontriggered)
+        self.saveas_action.triggered.connect(self.saveas_actiontriggered)
+
+        self.undo_action.triggered.connect(self.undo_actiontriggered)
+        self.redo_action.triggered.connect(self.redo_actiontriggered)
+        self.copy_action.triggered.connect(self.copy_actiontriggered)
+        self.paste_action.triggered.connect(self.paste_actiontriggered)
+        self.delete_action.triggered.connect(self.delete_actiontriggered)
+
 
     @pyqtSlot()
-    def loadNewXpa_pushButtonClicked(self):
-        nxpaName, _ = QFileDialog.getOpenFileName(self, 'nxpa 파일 선택', BASE_DIR, "nxpa (*.nxpa)")
+    def addSheet_pushButtonClicked(self):
+        self._addSheet_('새 탭')
 
-        if nxpaName:
-            # 파일 불러오기:
-            pass
-        else:
-            # 잘못된 파일이라고 팝업 dialog 띄우기
-            pass
-   
     @pyqtSlot()
-    def createNewXpa_pushButtonClicked(self):
-        logging.info(f'[createNewXpa_pushButtonClicked] Start')
-        logging.info(f'[createNewXpa_pushButtonClicked] Text: {self.newXpaName_lineEdit.text()}')
+    def removeSheet_pushButtonClicked(self):
+        self._removeSheet_()
 
-        if self.newXpaName_lineEdit.text():
+    @pyqtSlot()
+    def addCell_pushButtonClicked(self):
+        self._addCell_()
 
-            xpaInfo = {}
-            xpaInfo['nxpaName'] = self.newXpaName_lineEdit.text()
-            xpaInfo['type'] = self.selectType_comboBox.currentText()
-            xpaInfo['numSheet'] = self.numSheet_spinBox.value()
-            xpaInfo['numBlock'] = self.numBlock_spinBox.value()
+    @pyqtSlot()
+    def removeCell_pushButtonClicked(self):
+        self._removeCell_()
 
-            self.switch_window.emit(xpaInfo)
-            pass
-        else:
-            logging.warning(f'[createNewXpa_pushButtonClicked] No File Name')
-            return
+    @pyqtSlot()
+    def open_actiontriggered(self):
+        fileName = QFileDialog.getOpenFileName(self, 'xlsx file', './', 'Excel Files(*.xlsx)')
+        logging.info(fileName[0])
+        self.fileName_label.setText(fileName[0].split('/')[-1])
 
-        logging.info(f'[createNewXpa_pushButtonClicked] Done')
-    pass
+
+    def _addSheet_(self, text):
+        self.sheetList_tabWidget.addTab(SheetInnerTableWidget(), text + f'{self.sheetList_tabWidget.count()}')
+
+    def _addCell_(self):
+        pass
+
+    def _removeSheet_(self):
+        self.sheetList_tabWidget.removeTab(self.sheetList_tabWidget.currentIndex())
+
+    def _removeCell(self):
+        pass
+
+    def _openExcel(self):
+        fileName = QFileDialog.getOpenFileName(self, 'xlsx file', './', 'Excel Files(*.xlsx)')
+        logging.info(fileName[0])
+        self.fileName_label.setText(fileName[0].split('/')[-1])
+
+    @pyqtSlot()
+    def save_actiontriggered(self):
+        pass
+
+    @pyqtSlot()
+    def saveas_actiontriggered(self):
+        pass
+    
+    @pyqtSlot()
+    def undo_actiontriggered(self):
+        pass
+
+    @pyqtSlot()
+    def redo_actiontriggered(self):
+        pass
+
+    @pyqtSlot()
+    def copy_actiontriggered(self):
+        pass
+    
+    @pyqtSlot()
+    def paste_actiontriggered(self):
+        pass
+
+    @pyqtSlot()
+    def delete_actiontriggered(self):
+        pass
 
 
 class WindowController:
@@ -111,22 +128,26 @@ class WindowController:
         self.test = "test"
         pass
 
-    def showXpaMainWindow(self):
-        self.xpaMainWindow = XpaMainWindow()
-        self.xpaMainWindow.switch_window.connect(self.showWorkSpaceWindow)
-        self.xpaMainWindow.show()
+    def showManagerMainWindow(self):
+        self.managerMainWindow = ManagerMainWindow()
+        self.managerMainWindow.show()
 
-    def showWorkSpaceWindow(self, xpaInfo):
-        self.workSpaceWindow = WorkSpaceWindow(xpaInfo)
-        self.xpaMainWindow.close()
-        self.workSpaceWindow.show()
+#    def showXpaMainWindow(self):
+#        self.xpaMainWindow = XpaMainWindow()
+#        self.xpaMainWindow.switch_window.connect(self.showWorkSpaceWindow)
+#        self.xpaMainWindow.show()
+#
+#    def showWorkSpaceWindow(self, xpaInfo):
+#        self.workSpaceWindow = WorkSpaceWindow(xpaInfo)
+#        self.xpaMainWindow.close()
+#        self.workSpaceWindow.show()
 
 
 
 def main():
     app = QApplication(sys.argv)
     windowController = WindowController()
-    windowController.showXpaMainWindow()
+    windowController.showManagerMainWindow()
     app.exec_()
 
 
